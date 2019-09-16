@@ -57,7 +57,7 @@ void RX_Init (taskData_t* taskData)
 	uartConfig( taskData->uart, taskData->baudRate);
 	uartCallbackSet(taskData->uart, UART_RECEIVE, onRx, &ISR_RX_Data);	//NULL // Seteo un callback al evento de recepcion y habilito su interrupcion
 	uartInterrupt(taskData->uart, true);	// Habilito todas las interrupciones de UART_USB
-
+	//void uartInit2( uartMap_t uart, uint32_t baudRate, uint8_t dataBits, uint8_t parity, uint8_t stopBits );
 	// Timer RX
 	// Memoria
 
