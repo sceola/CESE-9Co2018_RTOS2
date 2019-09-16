@@ -53,6 +53,7 @@ void Procesa_RX_Task( void* pvParameters )
 
 void RX_Init (taskData_t* taskData)
 {
+	//
 	// Inicializa UART, interrupcion de RX y IRQ generales de UART.
 	uartConfig( taskData->uart, taskData->baudRate);
 	uartCallbackSet(taskData->uart, UART_RECEIVE, onRx, &ISR_RX_Data);	//NULL // Seteo un callback al evento de recepcion y habilito su interrupcion
