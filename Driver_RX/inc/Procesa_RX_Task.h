@@ -34,9 +34,11 @@ typedef enum{
 void Procesa_RX_Task( void* taskParmPtr );
 //extern void onRx( void *noUsado );
 
-void fsmFrameRX_Init( void );
-void fsmFrameRX_Update( void );
-void fsmFrameRX_Error( void );
+void fsmFrameRX_Init( char *RX_Frame_p );
+void fsmFrameRX_Update( char *RX_Frame_p );
+void fsmFrameRX_Error( char *RX_Frame_p );
+
+void Inicializar_RX_Frame(char *vector, uint32_t longitud);
 
 fsmFrameRX_state_t fsmFrameRX_state;
 

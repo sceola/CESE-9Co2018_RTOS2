@@ -31,8 +31,11 @@ void Procesa_RX_Task( void* pvParameters )
 	uartInterrupt(taskData->uart, true);	// Habilito todas las interrupciones de UART_USB
 
 	uint8_t RX_byte;
+	char RX_Frame[MAX_FRAME_SIZE]="Test";
+	char *RX_Frame_p=RX_Frame;
 	portTickType xLastWakeTime = xTaskGetTickCount();
 	const TickType_t xTicksToWait = pdMS_TO_TICKS( 0UL );	// Son 100ms=100UL.
+	fsmFrameRX_Init( RX_Frame_p );
 	while(TRUE) {
 		gpioToggle(LED1);
 		if( uxQueueMessagesWaiting( xQueue_Procesa_RX ) != 0 ) {
@@ -40,44 +43,87 @@ void Procesa_RX_Task( void* pvParameters )
 				RX_byte++;		// Para DEBUG.
 				debugPrintChar(RX_byte);
 				debugPrintEnter();
+
+				fsmFrameRX_Update( RX_Frame_p );
 			}
 		}
 		vTaskDelayUntil( &xLastWakeTime, taskData->delay / portTICK_RATE_MS );
 	}
 }
 
-void fsmFrameRX_Init( void )
+void RX_Init (taskData_t* taskData)
 {
+	// Inicializa UART, interrupcion de RX y IRQ generales de UART.
+	uartConfig( taskData->uart, taskData->baudRate);
+	uartCallbackSet(taskData->uart, UART_RECEIVE, onRx, &ISR_RX_Data);	//NULL // Seteo un callback al evento de recepcion y habilito su interrupcion
+	uartInterrupt(taskData->uart, true);	// Habilito todas las interrupciones de UART_USB
+
+	// Timer RX
+	// Memoria
+
+}
+
+void fsmFrameRX_Init( char *RX_Frame_p )
+{
+	Inicializar_RX_Frame(&RX_Frame_p, MAX_FRAME_SIZE);
 	fsmFrameRX_state=ESPERA_PRIMER_BYTE;
 }
 
-void fsmFrameRX_Error( void )
+void fsmFrameRX_Error( char *RX_Frame_p )
 {
+	Inicializar_RX_Frame(&RX_Frame_p, MAX_FRAME_SIZE);
 	fsmFrameRX_state=ESPERA_PRIMER_BYTE;
 }
 
-void fsmFrameRX_Update( void )
+void Inicializar_RX_Frame(char *vector, uint32_t longitud)
+	{
+		uint32_t i = 0;
+
+		for (; i < longitud; i++ )
+		{
+			vector[i] ="";
+		}
+	}
+
+void fsmFrameRX_Update( char *RX_Frame_p )
 {
 	static bool_t flagFalling = FALSE;
 	static bool_t flagRising = FALSE;
 
 	static uint8_t contFalling = 0;
 	static uint8_t contRising = 0;
+	//char ver="a";
+	uartWriteString(UART_USB, RX_Frame_p);
 
 	switch( fsmFrameRX_state )
 	{
 	case ESPERA_PRIMER_BYTE:
 		// Verifico si me llego algo por UART.
 		//if(  ){
-			fsmFrameRX_state = ESPERA_PROX_BYTE;
+
+
+
+		/*
+		 * ME falta crear una structura par pasarle el puntero a esto,
+		 * donde tenga el contador de bytes RX.
+		 *
+		 * El timer, al llegar a timeout, tiene que disparar el inicio el proceso de CRC y pasar
+		 * los datos a otro lado... para poder seguir recibiendo datos.....
+		 *
+		 */
+
+		//char *RX_Frame_p
+		fsmFrameRX_state = ESPERA_PROX_BYTE;
 			//xTimerReset(xOneShotTimerRX,0);		// Reseteo Timer de RX. Comienza cuenta.
+		//Incremento cont de bytes rx.
 		//}
 		break;
 
 	case ESPERA_PROX_BYTE:
 
 		//if( gpioRead(tecla) ){
-
+		// Incremento cont de bytes rx.
+		//xTimerReset(xOneShotTimerRX,0);		// Reseteo Timer de RX. Comienza cuenta.
 		//}
 		break;
 
@@ -134,7 +180,7 @@ void fsmFrameRX_Update( void )
 		break;
 
 	default:
-		fsmFrameRX_Error();
+		fsmFrameRX_Error(RX_Frame_p);
 		break;
 	}
 }
