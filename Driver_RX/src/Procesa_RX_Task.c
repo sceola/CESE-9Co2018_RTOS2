@@ -51,6 +51,54 @@ void Procesa_RX_Task( void* pvParameters )
 	}
 }
 
+
+uint32_t usartInit(driverUsart_t const *obj,
+					portNumber_t portNumber,
+					baudRate_t baudRate,
+					dataBits_t dataBits,
+					stopBits_t stopBits,
+					parity_t parity)
+{
+	uint32_t retval=0;
+	obj->port=portNumber;
+	obj->rxTranfer->buffer
+	//void uartInit2( uartMap_t uart, uint32_t baudRate, uint8_t dataBits, uint8_t parity, uint8_t stopBits )
+	uartInit2( portNumber, baudRate, dataBits, stopBits, parity );
+	//uartConfig( portNumber, baudRate);
+	switch (portNumber)
+	case USART0:
+		uartCallbackSet(portNumber, UART_RECEIVE, ISR_RX_USART0, NULL);		// Callback de RX
+		uartCallbackSet(portNumber, UART_TRANSMITER_FREE, ISR_TX_USART0, NULL);
+		uartInterrupt(portNumber, true);
+
+		break;
+	case USART1:
+		uartCallbackSet(portNumber, UART_RECEIVE, ISR_RX_USART1, NULL);		// Callback de RX
+		uartCallbackSet(portNumber, UART_TRANSMITER_FREE, ISR_TX_USART1, NULL);
+		uartInterrupt(portNumber, true);
+		break;
+	case USART2:
+		uartCallbackSet(portNumber, UART_RECEIVE, ISR_RX_USART2, NULL);		// Callback de RX
+		uartCallbackSet(portNumber, UART_TRANSMITER_FREE, ISR_TX_USART2, NULL);
+		uartInterrupt(portNumber, true);
+		break;
+	case USART3:
+		uartCallbackSet(portNumber, UART_RECEIVE, ISR_RX_USART3, NULL);		// Callback de RX
+		uartCallbackSet(portNumber, UART_TRANSMITER_FREE, ISR_TX_USART3, NULL);
+		uartInterrupt(portNumber, true);
+		break;
+	default:
+		retval=1;
+		break;
+
+	//uartInterrupt(portNumber, true);
+
+	// Timer RX
+	// Memoria
+	return retval;
+}
+
+
 void RX_Init (taskData_t* taskData)
 {
 	//

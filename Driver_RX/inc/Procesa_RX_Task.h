@@ -14,6 +14,7 @@
 #include "queue.h"
 #include "timers.h"
 #include "onRx.h"
+#include "driver_usart.h"
 
 #define SIZE_COLA_RX 10
 #define MAX_FRAME_SIZE 5

@@ -1,4 +1,4 @@
-//*
+/*
 * driver_usart.h
 *
 *  Created on: 15 sep. 2019
